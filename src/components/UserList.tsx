@@ -37,10 +37,14 @@ let UserList:React.FC<IProps> = () => {
     let {loading , users , errorMessage} = state;
     return(
         <React.Fragment>
-            <h3>UserList</h3>
+            <button type="button" className="btn btn-danger float-right" onClick={() => UserService.deleteAll()}>Delete all rows</button>
+            <a type="button" className="btn btn-info float-right" href="add">Add user</a>
             <div className="container">
                 <div className="row">
                     <div className="col">
+                    
+                    
+                   
                         <table className="table table-hover text-center table-striped">
                             <thead className="bg-success text-white">
                                 <tr>
@@ -48,6 +52,7 @@ let UserList:React.FC<IProps> = () => {
                                     <th>first name</th>
                                     <th>last name</th>
                                     <th>email</th>
+                                    <div className="bg-danger">🗑</div>
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,6 +64,7 @@ let UserList:React.FC<IProps> = () => {
                                                 <td>{user.firstName}</td>
                                                 <td>{user.lastName}</td>
                                                 <td>{user.email}</td>
+                                                <button className="bg-danger" onClick={() => UserService.delete(user.id)}>Delete</button>
                                             </tr>
                                         )
                                     })

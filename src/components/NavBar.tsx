@@ -7,11 +7,16 @@ interface IProps{}
 let NavBar:React.FC<IProps> = () => {
     return(
         <React.Fragment>
-            <nav className="navbar navbar-dark bg-dark navbar-expand-sm">
-                <div className="container">
-                    <Link to={'/'} className="navbar-brand">React Router</Link>
+            <div className="container mt-3">
+                <div className="grid">
+                    <div className="row">
+                        <div className="col">
+                            <a className="h3 fw-bold text-success" href='/'>Werknemers</a>
+                            <p className="fst-italic">In deze applicatie kan je werknemers documenteren.</p>
+                        </div>
+                    </div>
                 </div>
-            </nav>
+            </div>
         </React.Fragment>
     )
 };

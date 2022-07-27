@@ -31,4 +31,9 @@ export class UserService{
         let dataURL:string = `${this.serverURL}/employees/${id}`;
         return axios.delete(dataURL);
       }
+    public static deleteAll() {
+        let dataURL:string = `${this.serverURL}/employees`;
+        return axios.delete(dataURL);
+
+      }
 }
