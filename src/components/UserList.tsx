@@ -17,8 +17,12 @@ let UserList:React.FC<IProps> = () => {
     });
 
     const deleteUser = (user: IUser) => {
-        UserService.delete(user.id);
-
+        try{
+            UserService.delete(user.id);
+        } catch(error){
+            console.log("test")
+            return;    
+        }
         const userIndex = state.users.indexOf(user);
         if (userIndex !== undefined) {
             const updatedUsers = [...state.users];
