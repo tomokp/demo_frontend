@@ -36,4 +36,8 @@ export class UserService{
         return axios.delete(dataURL);
 
       }
+    public static generate(amount: number) {
+      let dataURL:string = `${this.serverURL}/employees/${amount}`;
+      return axios.post(dataURL);
+    }
 }

@@ -1,27 +1,30 @@
-import React, {useEffect, useState} from 'react';
-import {IUser} from "../models/IUser";
-import {UserService} from "../services/UserService";
+import { getValue } from '@testing-library/user-event/dist/utils';
+import React, { useEffect, useState } from 'react';
+import { IUser } from "../models/IUser";
+import { UserService } from "../services/UserService";
 
-interface IState{
-    loading : boolean;
-    users : IUser[];
-    errorMessage : string;
+interface IState {
+    loading: boolean;
+    users: IUser[];
+    errorMessage: string;
+    generateAmount: string;
 }
-interface IProps{}
+interface IProps { }
 
-let UserList:React.FC<IProps> = () => {
-    let [state , setState] = useState<IState>({
-        loading : false,
-        users : [] as IUser[],
-        errorMessage : ''
+let UserList: React.FC<IProps> = () => {
+    let [state, setState] = useState<IState>({
+        loading: false,
+        users: [] as IUser[],
+        errorMessage: '',
+        generateAmount: "3"
     });
 
     const deleteUser = (user: IUser) => {
-        try{
+        try {
             UserService.delete(user.id);
-        } catch(error){
+        } catch (error) {
             console.log("test")
-            return;    
+            return;
         }
         const userIndex = state.users.indexOf(user);
         if (userIndex !== undefined) {
@@ -32,6 +35,8 @@ let UserList:React.FC<IProps> = () => {
                 loading: state.loading,
                 users: updatedUsers,
                 errorMessage: state.errorMessage,
+                generateAmount: state.generateAmount
+            
             });
         }
     }
@@ -43,38 +48,83 @@ let UserList:React.FC<IProps> = () => {
             loading: state.loading,
             users: [],
             errorMessage: state.errorMessage,
+            generateAmount: state.generateAmount
+        });
+    }
+
+    const generateUsers = (amount: number) => {
+        const userIndex = UserService.generate(amount);
+        if (userIndex !== undefined) {
+            userIndex.then(function (result) {
+                const newGeneratedUsers = result.data
+                setState({
+                    loading: state.loading,
+                    users: [...users, ...result.data],
+                    errorMessage: state.errorMessage,
+                    generateAmount: state.generateAmount
+                });
+            })
+        } else {
+            console.log("No valid amount of generated users")
+            setState({
+                loading: state.loading,
+                users: [...users],
+                errorMessage: state.errorMessage,
+                generateAmount: state.generateAmount
+            });
+        }
+
+
+
+        const updatedUsers = [...state.users];
+        //console.log(updatedUsers)
+
+    }
+
+    const handleChange = (amount : string)=> {
+        setState({
+            loading: state.loading,
+            users: [...users],
+            errorMessage: state.errorMessage,
+            generateAmount: "4"
         });
     }
 
     useEffect(() => {
-        setState({...state, loading : true});
+        setState({ ...state, loading: true });
         UserService.getAll().then((response) => {
             setState({
                 ...state,
-                loading : false,
-                users : response.data
+                loading: false,
+                users: response.data
             })
         }).catch((error) => {
             setState({
                 ...state,
-                loading : false,
-                errorMessage : error.message
+                loading: false,
+                errorMessage: error.message
             })
             console.log("error")
         });
-    } , []);
+    }, []);
 
-    let {loading , users , errorMessage} = state;
-    return(
+    let { loading, users, errorMessage } = state;
+    return (
         <React.Fragment>
-            <button type="button" className="btn btn-danger float-right" onClick={() => deleteAllUsers()}>Delete all rows</button>
-            <a type="button" className="btn btn-info float-right" href="add">Add user</a>
+            <button className="btn btn-neutral float-right background-red">randomized users:<input type="text"
+                className="form-control"
+                id="firstName"
+                required
+                defaultValue={state.generateAmount}
+                onChange={() => handleChange("2")}
+                name="firstName" /><a className="btn btn-success text-white" onClick={() => generateUsers(Number(state.generateAmount))}>Generate</a></button>
+            <a type="button" className="btn btn-info float-right" href="add">Add custom user</a>
             <div className="container">
                 <div className="row">
                     <div className="col">
-                    
-                    
-                   
+
+
+
                         <table className="table table-hover text-center table-striped">
                             <thead className="bg-success text-white">
                                 <tr>
@@ -82,13 +132,15 @@ let UserList:React.FC<IProps> = () => {
                                     <th>first name</th>
                                     <th>last name</th>
                                     <th>email</th>
-                                    <th className="bg-danger">🗑</th>
+                                    <th className="bg-danger" style={{
+                                            cursor: 'pointer',
+                                        }} onClick={() => deleteAllUsers()}>🗑</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {
                                     users.length > 0 && users.map(user => {
-                                        return(
+                                        return (
                                             <tr key={user.id}>
                                                 <td>{user.id}</td>
                                                 <td>{user.firstName}</td>
