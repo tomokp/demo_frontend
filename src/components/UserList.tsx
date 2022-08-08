@@ -8,16 +8,74 @@ interface IState {
     users: IUser[];
     errorMessage: string;
     generateAmount: string;
+    show: boolean;
+    selectedData: IUser;
+
 }
-interface IProps { }
+interface IProps {
+}
 
 let UserList: React.FC<IProps> = () => {
     let [state, setState] = useState<IState>({
         loading: false,
         users: [] as IUser[],
         errorMessage: '',
-        generateAmount: "3"
+        generateAmount: "3",
+        show: false,
+        selectedData: {
+            firstName: "",
+            lastName: "",
+            email: ""
+        }
     });
+
+    const onFirstNameChange = (firstname: string) => {
+        setState({
+            loading: state.loading,
+            users: [...users],
+            errorMessage: state.errorMessage,
+            generateAmount: state.generateAmount,
+            show: true,
+            selectedData: {
+                id: state.selectedData.id,
+                firstName: firstname,
+                lastName: state.selectedData.lastName,
+                email: state.selectedData.email
+            }
+        });
+    }
+
+    const onLastNameChange = (lastname: string) => {
+        setState({
+            loading: state.loading,
+            users: [...users],
+            errorMessage: state.errorMessage,
+            generateAmount: state.generateAmount,
+            show: true,
+            selectedData: {
+                id: state.selectedData.id,
+                firstName: state.selectedData.firstName,
+                lastName: lastname,
+                email: state.selectedData.email
+            }
+        });
+    }
+
+    const onEmailChange = (email: string) => {
+        setState({
+            loading: state.loading,
+            users: [...users],
+            errorMessage: state.errorMessage,
+            generateAmount: state.generateAmount,
+            show: true,
+            selectedData: {
+                id: state.selectedData.id,
+                firstName: state.selectedData.firstName,
+                lastName: state.selectedData.lastName,
+                email: email
+            }
+        });
+    }
 
     const deleteUser = (user: IUser) => {
         try {
@@ -35,8 +93,14 @@ let UserList: React.FC<IProps> = () => {
                 loading: state.loading,
                 users: updatedUsers,
                 errorMessage: state.errorMessage,
-                generateAmount: state.generateAmount
-            
+                generateAmount: state.generateAmount,
+                show: false,
+                selectedData: {
+                    firstName: "",
+                    lastName: "",
+                    email: ""
+                }
+
             });
         }
     }
@@ -48,20 +112,87 @@ let UserList: React.FC<IProps> = () => {
             loading: state.loading,
             users: [],
             errorMessage: state.errorMessage,
-            generateAmount: state.generateAmount
+            generateAmount: state.generateAmount,
+            show: false,
+            selectedData: {
+                firstName: "",
+                lastName: "",
+                email: ""
+            }
         });
     }
+
+    const hideModal = () => {
+        setState({
+            loading: state.loading,
+            users: [...users],
+            errorMessage: state.errorMessage,
+            generateAmount: state.generateAmount,
+            show: false,
+            selectedData: {
+                firstName: "",
+                lastName: "",
+                email: ""
+            }
+        });
+    }
+
+    const handleClick = (selectedRec: IUser) => {
+        setState({
+            loading: state.loading,
+            users: [...users],
+            errorMessage: state.errorMessage,
+            generateAmount: state.generateAmount,
+            show: true,
+            selectedData: selectedRec
+        });
+    }
+
+    const Modal = ({ handleClose, details }: { handleClose: any, details: IUser }) => {
+        return (
+            <div className="modal display-block">
+                <section className="modal-main">
+                    <div className="App">
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">SNO</th>
+                                    <th scope="col">first name</th>
+                                    <th scope="col">last name</th>
+                                    <th scope="col">email</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{details?.id}</td>
+                                    <td><input type="text" defaultValue={details?.firstName} onChange={(e) => onFirstNameChange(e.target.value)}></input></td>
+                                    <td><input type="text" defaultValue={details?.lastName} onChange={(e) => onLastNameChange(e.target.value)}></input></td>
+                                    <td><input type="text" defaultValue={details?.email} onChange={(e) => onEmailChange(e.target.value)}></input></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button className='bg-danger' onClick={handleClose}>close</button>
+                </section>
+            </div>
+        );
+    };
 
     const generateUsers = (amount: number) => {
         const userIndex = UserService.generate(amount);
         if (userIndex !== undefined) {
             userIndex.then(function (result) {
-                const newGeneratedUsers = result.data
                 setState({
                     loading: state.loading,
                     users: [...users, ...result.data],
                     errorMessage: state.errorMessage,
-                    generateAmount: state.generateAmount
+                    generateAmount: state.generateAmount,
+                    show: false,
+                    selectedData: {
+                        firstName: "",
+                        lastName: "",
+                        email: ""
+                    }
                 });
             })
         } else {
@@ -70,7 +201,13 @@ let UserList: React.FC<IProps> = () => {
                 loading: state.loading,
                 users: [...users],
                 errorMessage: state.errorMessage,
-                generateAmount: state.generateAmount
+                generateAmount: state.generateAmount,
+                show: false,
+                selectedData: {
+                    firstName: "",
+                    lastName: "",
+                    email: ""
+                }
             });
         }
 
@@ -81,12 +218,18 @@ let UserList: React.FC<IProps> = () => {
 
     }
 
-    const handleChange = (amount : string)=> {
+    const handleChange = (amount: string) => {
         setState({
             loading: state.loading,
             users: [...users],
             errorMessage: state.errorMessage,
-            generateAmount: "4"
+            generateAmount: amount,
+            show: false,
+            selectedData: {
+                firstName: "",
+                lastName: "",
+                email: ""
+            }
         });
     }
 
@@ -116,7 +259,7 @@ let UserList: React.FC<IProps> = () => {
                 id="firstName"
                 required
                 defaultValue={state.generateAmount}
-                onChange={() => handleChange("2")}
+                onChange={(e) => handleChange(e.target.value)}
                 name="firstName" /><a className="btn btn-success text-white" onClick={() => generateUsers(Number(state.generateAmount))}>Generate</a></button>
             <a type="button" className="btn btn-info float-right" href="add">Add custom user</a>
             <div className="container">
@@ -132,9 +275,10 @@ let UserList: React.FC<IProps> = () => {
                                     <th>first name</th>
                                     <th>last name</th>
                                     <th>email</th>
+                                    <th className="bg-info">edit</th>
                                     <th className="bg-danger" style={{
-                                            cursor: 'pointer',
-                                        }} onClick={() => deleteAllUsers()}>🗑</th>
+                                        cursor: 'pointer',
+                                    }} onClick={() => deleteAllUsers()}>🗑</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -146,6 +290,7 @@ let UserList: React.FC<IProps> = () => {
                                                 <td>{user.firstName}</td>
                                                 <td>{user.lastName}</td>
                                                 <td>{user.email}</td>
+                                                <td><button className="bg-info" onClick={() => handleClick(user)}>🔎</button></td>
                                                 <td><button className="bg-danger" onClick={() => deleteUser(user)}>Delete</button></td>
                                             </tr>
                                         )
@@ -153,6 +298,9 @@ let UserList: React.FC<IProps> = () => {
                                 }
                             </tbody>
                         </table>
+                        <div>
+                            {state.show && <Modal handleClose={hideModal} details={state.selectedData} />}
+                        </div>
                     </div>
                 </div>
             </div>
