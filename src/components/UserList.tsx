@@ -1,5 +1,5 @@
 import { getValue } from '@testing-library/user-event/dist/utils';
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { IUser } from "../models/IUser";
 import { UserService } from "../services/UserService";
 
@@ -14,6 +14,10 @@ interface IState {
 }
 interface IProps {
 }
+
+var newFirstName: string;
+var newLastName: string;
+var newEmail: string;
 
 let UserList: React.FC<IProps> = () => {
     let [state, setState] = useState<IState>({
@@ -30,51 +34,17 @@ let UserList: React.FC<IProps> = () => {
     });
 
     const onFirstNameChange = (firstname: string) => {
-        setState({
-            loading: state.loading,
-            users: [...users],
-            errorMessage: state.errorMessage,
-            generateAmount: state.generateAmount,
-            show: true,
-            selectedData: {
-                id: state.selectedData.id,
-                firstName: firstname,
-                lastName: state.selectedData.lastName,
-                email: state.selectedData.email
-            }
-        });
+        newFirstName = firstname;
     }
 
     const onLastNameChange = (lastname: string) => {
-        setState({
-            loading: state.loading,
-            users: [...users],
-            errorMessage: state.errorMessage,
-            generateAmount: state.generateAmount,
-            show: true,
-            selectedData: {
-                id: state.selectedData.id,
-                firstName: state.selectedData.firstName,
-                lastName: lastname,
-                email: state.selectedData.email
-            }
-        });
+        newLastName = lastname;
     }
 
     const onEmailChange = (email: string) => {
-        setState({
-            loading: state.loading,
-            users: [...users],
-            errorMessage: state.errorMessage,
-            generateAmount: state.generateAmount,
-            show: true,
-            selectedData: {
-                id: state.selectedData.id,
-                firstName: state.selectedData.firstName,
-                lastName: state.selectedData.lastName,
-                email: email
-            }
-        });
+        newEmail = email;
+        console.log(newEmail);
+        
     }
 
     const deleteUser = (user: IUser) => {
@@ -130,11 +100,13 @@ let UserList: React.FC<IProps> = () => {
             generateAmount: state.generateAmount,
             show: false,
             selectedData: {
-                firstName: "",
-                lastName: "",
-                email: ""
+                firstName: newFirstName,
+                lastName: newLastName,
+                email: newEmail
             }
         });
+        console.log({...state})
+        UserService.update(state.selectedData)
     }
 
     const handleClick = (selectedRec: IUser) => {
@@ -165,14 +137,14 @@ let UserList: React.FC<IProps> = () => {
                             <tbody>
                                 <tr>
                                     <td>{details?.id}</td>
-                                    <td><input type="text" defaultValue={details?.firstName} onChange={(e) => onFirstNameChange(e.target.value)}></input></td>
-                                    <td><input type="text" defaultValue={details?.lastName} onChange={(e) => onLastNameChange(e.target.value)}></input></td>
-                                    <td><input type="text" defaultValue={details?.email} onChange={(e) => onEmailChange(e.target.value)}></input></td>
+                                    <td><input className="form-control" id="firstName" name="firstName" required type="text" defaultValue={state.selectedData.firstName} onChange={(e) => onFirstNameChange(e.target.value)}></input></td>
+                                    <td><input type="text" defaultValue={state.selectedData.lastName} onChange={(e) => onLastNameChange(e.target.value)}></input></td>
+                                    <td><input type="text" defaultValue={details?.email} onChange={(e : any) => onEmailChange(e.target.value)}></input></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <button className='bg-danger' onClick={handleClose}>close</button>
+                    <button className='bg-danger' onClick={handleClose}>close without saving</button>
                 </section>
             </div>
         );
